@@ -20,12 +20,12 @@ end
 local version = tonumber(data.get("stversion", "stversion"))
 
 shell.run("delete Ssv")
-shell.run("pastebin get https://pastebin.com/fPj3Yf1U Ssv")
+shell.run("wget https://raw.githubusercontent.com/Terandox-The-Pineapple/TRX-Storage/main/Version.lua Ssv")
 shell.run("Ssv")
 
 if tonumber(data.get("stversion", "stversion")) > version then
 	shell.run("delete startup")
-	shell.run("pastebin get https://pastebin.com/KvJUYPip startup")
+	shell.run("wget https://raw.githubusercontent.com/Terandox-The-Pineapple/TRX-Storage/main/Handheld.lua startup")
 	shell.run("reboot")
 	print("Updated Storage-System")
 else
@@ -34,9 +34,9 @@ end
 
 if fs.exists("TRXDictionary") == true then shell.run("delete TRXDictionary") end
 if data.get("LangLink", "config") == nil then
-	shell.run("pastebin get 9zdiC2Yg TRXDictionary")
+	shell.run("wget https://raw.githubusercontent.com/Terandox-The-Pineapple/TRX-Librarys/main/TRXDictionary.lua TRXDictionary")
 else
-	shell.run("pastebin get " .. data.get("LangLink", "config") .. " TRXDictionary")
+	shell.run("wget " .. data.get("LangLink", "config") .. " TRXDictionary")
 end
 
 shell.run("TRXDictionary")
