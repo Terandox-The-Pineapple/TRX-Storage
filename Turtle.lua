@@ -160,7 +160,7 @@ function craft(replyChannel, message, isFinal)
 	end
 end
 
-function craftcheck(replyChannel, localChannel, pattern)
+function craftcheck(replyChannel, localChannel, pattern, maxCount)
 	for i = 1, 9 do
 		local slot = i
 		if slot == 4 or slot == 5 or slot == 6 then
@@ -175,13 +175,13 @@ function craftcheck(replyChannel, localChannel, pattern)
 			turtle.suckDown(1)
 		end
 	end
-	turtle.select(8)
-	turtle.craft()
+	turtle.select(16)
+	local is_crafted = turtle.craft()
 	for i = 1, 16 do
 		turtle.select(i)
 		turtle.dropDown()
 	end
-	wireless.transmit(replyChannel, localChannel, "craftingCheckFinish")
+	wireless.transmit(replyChannel, localChannel, "craftingCheckFinish|" .. (is_crafted and 'true' or 'false') .. "|" .. maxCount)
 end
 
 local messageHandles = {
@@ -219,12 +219,13 @@ local messageHandles = {
 
 	["returnPattern"] = function(replyChannel, message)
 		local pattern = utils.split(message, "|", 2)
+		local maxCount = utils.split(message, "|", 3)
 		local currentPattern = {}
 		for i = 1, 9 do
 			local item = utils.split(pattern, ";", i)
 			currentPattern[#currentPattern + 1] = item
 		end
-		craftcheck(replyChannel, localChannel, currentPattern)
+		craftcheck(replyChannel, localChannel, currentPattern, maxCount)
 	end,
 }
 

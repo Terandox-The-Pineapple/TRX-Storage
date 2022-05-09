@@ -639,21 +639,23 @@ local messageHandles = {
 	end,
 	["returnPatternT"] = function(_, message)
 		local pattern = utils.split(message, "|", 2)
+		local maxCount = utils.split(message, "|", 3)
 		currentPatternString = pattern
 		for i = 1, 9 do
 			local item = utils.split(pattern, ";", i)
 			currentPattern[#currentPattern + 1] = item
 		end
-		return "returnPatternS|" .. pattern
+		return "returnPatternS|" .. pattern .. "|" .. maxCount
 	end,
 	["PatternTrue"] = function(_, message)
 		local recipeName = utils.split(message, "|", 2)
 		local patterCount = utils.split(message, "|", 3)
+		local maxCount = utils.split(message, "|", 4)
 		if currentScreen == screens.recipes then
 			term.setCursorPos(2, 6)
 			term.write(dictionary[localLang]["recipe_saved"])
 		end
-		return "addRecipe|" .. recipeName .. "|" .. currentPatternString .. "|" .. patterCount
+		return "addRecipe|" .. recipeName .. "|" .. currentPatternString .. "|" .. patterCount .. "|" .. maxCount
 	end,
 	["PatternFalse"] = function(_, message)
 		if currentScreen == screens.recipes then

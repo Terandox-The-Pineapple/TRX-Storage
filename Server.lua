@@ -406,10 +406,6 @@ function craftItem(itemName, count, check, final)
 	if recipe == nil or recipe == "nil" then return false end
 	local pattern = textutils.unserialize(parsePattern(recipe))
 	local trueCount = math.ceil(count / pattern["#amount"])
-	--local command = "craft|"..trueCount.."|"..textutils.serialize(pattern)
-	if final == nil or final == false then
-		--command = "innerCraft|"..trueCount.."|"..textutils.serialize(pattern)
-	end
 	print(itemName .. " : " .. count)
 
 	local isPossible = false
@@ -437,10 +433,12 @@ function craftItem(itemName, count, check, final)
 
 	if isPossible == true then
 		local counter = count
+		local maxStack = 64
+		if pattern["#maxCount"] < maxStack then maxStack = pattern["#maxCount"] end
 		while counter > 0 do
-			if counter > 64 then
-				craftMissions[#craftMissions + 1] = { itemName = itemName, count = 64, final = final }
-				counter = counter - 64
+			if counter > maxStack then
+				craftMissions[#craftMissions + 1] = { itemName = itemName, count = maxStack, final = final }
+				counter = counter - maxStack
 			else
 				craftMissions[#craftMissions + 1] = { itemName = itemName, count = counter, final = final }
 				counter = 0
@@ -471,8 +469,7 @@ function pushToCraft()
 		local pattern = textutils.unserialize(parsePattern(recipe))
 		local trueCount = math.ceil(mission.count / pattern["#amount"])
 		for itemID, item in pairs(pattern["#items"]) do
-			local itemCount = pattern[item].count
-			local itemCount = itemCount * trueCount
+			local itemCount = pattern[item].count * trueCount
 			local positions = getItemPosition(item, itemCount)
 			if item ~= nil and positions ~= nil then
 				local remainder = itemCount
@@ -510,6 +507,7 @@ end
 function parsePattern(recipe)
 	local patternCount = tonumber(utils.split(recipe, "|", 2))
 	local trueRecipe = tostring(utils.split(recipe, "|", 1))
+	local maxCount = tonumber(utils.split(recipe, "|", 3))
 	local itemsData = {}
 	local id = 1
 	for i = 1, 9 do
@@ -538,6 +536,7 @@ function parsePattern(recipe)
 		end
 	end
 	itemsData["#amount"] = patternCount
+	itemsData["#maxCount"] = maxCount
 
 	return textutils.serialise(itemsData)
 end
@@ -656,7 +655,8 @@ local messageHandles = {
 		local item = utils.split(message, "|", 2)
 		local recipe = utils.split(message, "|", 3)
 		local patternCount = utils.split(message, "|", 4)
-		recipe = recipe .. "|" .. patternCount
+		local maxCount = utils.split(message, "|", 5)
+		recipe = recipe .. "|" .. patternCount .. "|" .. maxCount
 		data.set(item, recipe, "db/recipes")
 		print(dictionary[localLang]["adding_recipe"] .. item .. "-" .. recipe)
 		indexItems()
@@ -742,32 +742,48 @@ local messageHandles = {
 
 	["readRecipe"] = function(replyChannel, message)
 		local message = ""
+		local maxCount = 64
 		for slot = 1, 9 do
 			if craftingX.chest.getItemDetail(slot) ~= nil then
+				if craftingX.chest.getItemDetail(slot).maxCount < maxCount and craftingX.chest.getItemDetail(slot).maxCount > 0 then maxCount = craftingX.chest.getItemDetail(slot).maxCount end
 				message = message .. craftingX.chest.getItemDetail(slot).displayName .. ";"
 			else
 				message = message .. " ;"
 			end
 		end
-		return "returnPatternT|" .. message
+		return "returnPatternT|" .. message .. "|" .. maxCount
 	end,
 
 	["returnPatternS"] = function(replyChannel, message)
 		local pattern = utils.split(message, "|", 2)
-		local command = "returnPattern|" .. pattern
+		local maxCount = utils.split(message, "|", 3)
+		local command = "returnPattern|" .. pattern .. "|" .. maxCount
 		local turtle = getIdleTurtle()
 		modems["wireless"].transmit(turtle.channel, localChannel, command)
 	end,
 
 	["craftingCheckFinish"] = function(replyChannel, message)
-		if #craftingX.chest.list() == 1 then
+		local is_crafted = utils.split(message, "|", 2)
+		local maxCount = utils.split(message, "|", 3)
+		if is_crafted == "true" then
 			for i, stack in pairs(craftingX.chest.list()) do
 				local targetName = craftingX.chest.getItemDetail(i).displayName
 				if craftingX.chest.getItemDetail(i).displayName ~= nil then
-					local PatternCount = craftingX.chest.getItemDetail(i).count
-					sendToStorage(false)
-					local command = "PatternTrue|" .. targetName .. "|" .. PatternCount
-					modems["wireless"].transmit(localChannel, localChannel, command)
+					if i ~= 9 then
+						if craftingX.chest.getItemDetail(i + 1) == nil then
+							local PatternCount = craftingX.chest.getItemDetail(i).count
+							sendToStorage(false)
+							local command = "PatternTrue|" .. targetName .. "|" .. PatternCount .. "|" .. maxCount
+							modems["wireless"].transmit(localChannel, localChannel, command)
+							break
+						end
+					else
+						local PatternCount = craftingX.chest.getItemDetail(i).count
+						sendToStorage(false)
+						local command = "PatternTrue|" .. targetName .. "|" .. PatternCount .. "|" .. maxCount
+						modems["wireless"].transmit(localChannel, localChannel, command)
+						break
+					end
 				end
 			end
 		else
