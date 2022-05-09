@@ -181,7 +181,7 @@ function craftcheck(replyChannel, localChannel, pattern, maxCount)
 		turtle.select(i)
 		turtle.dropDown()
 	end
-	wireless.transmit(replyChannel, localChannel, "craftingCheckFinish|" .. is_crafted .. "|" .. maxCount)
+	wireless.transmit(replyChannel, localChannel, "craftingCheckFinish|" .. (is_crafted and 'true' or 'false') .. "|" .. maxCount)
 end
 
 local messageHandles = {
