@@ -49,18 +49,18 @@ local localLang = data.get("language", "config")
 
 if data.get("channel", "channel") == nil then
 	io.write(dictionary[localLang]["channel_number"])
-	data.set("channel", read(), "channel")
+	data.set("channel", io.read(), "channel")
 end
 local localChannel = tonumber(data.get("channel", "channel"))
 
 if data.get("output", "output") == nil then
 	io.write(dictionary[localLang]["name_of_output_chest"])
-	data.set("output", read(), "output")
+	data.set("output", io.read(), "output")
 end
 
 if data.get("crafting", "crafting") == nil then
 	io.write(dictionary[localLang]["name_of_crafting_dropper"])
-	data.set("crafting", read(), "crafting")
+	data.set("crafting", io.read(), "crafting")
 end
 
 local outputX = { chest = peripheral.wrap(tostring(data.get("output", "output"))), name = tostring(data.get("output", "output")) }

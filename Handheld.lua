@@ -53,7 +53,7 @@ button.setMonitor(term)
 
 if data.get("channel", "channel") == nil then
 	io.write(dictionary[localLang]["server_channel"])
-	data.set("channel", read(), "channel")
+	data.set("channel", io.read(), "channel")
 end
 local localChannel = tonumber(data.get("channel", "channel"))
 local targetChannel = tonumber(data.get("channel", "channel"))

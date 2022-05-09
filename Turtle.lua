@@ -56,7 +56,7 @@ local self = {
 
 if data.get("channel", "channel") == nil then
 	io.write(dictionary[localLang]["server_channel"])
-	data.set("channel", read(), "channel")
+	data.set("channel", io.read(), "channel")
 end
 
 local sendChannel = tonumber(data.get("channel", "channel"))
