@@ -1,5 +1,5 @@
-if fs.exists("data") == false then shell.run("pastebin get LnvzL7ur data") end
-if os.loadAPI("data") == false then error("Failed to load data API") end
+if fs.exists("data") == false then shell.run("wget https://raw.githubusercontent.com/Terandox-The-Pineapple/TRX-Librarys/main/data.lua data") end
+local data = require("data")
 
 local dictionary = {
     ["de"] = {
