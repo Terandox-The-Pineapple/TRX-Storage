@@ -745,7 +745,7 @@ local messageHandles = {
 		local maxCount = 64
 		for slot = 1, 9 do
 			if craftingX.chest.getItemDetail(slot) ~= nil then
-				if craftingX.chest.getItemDetail(slot).maxCount < maxCount then maxCount = craftingX.chest.getItemDetail(slot).maxCount end
+				if craftingX.chest.getItemDetail(slot).maxCount < maxCount and craftingX.chest.getItemDetail(slot).maxCount > 0 then maxCount = craftingX.chest.getItemDetail(slot).maxCount end
 				message = message .. craftingX.chest.getItemDetail(slot).displayName .. ";"
 			else
 				message = message .. " ;"
