@@ -769,7 +769,7 @@ local messageHandles = {
 			for i, stack in pairs(craftingX.chest.list()) do
 				local targetName = craftingX.chest.getItemDetail(i).displayName
 				if craftingX.chest.getItemDetail(i).displayName ~= nil then
-					if i ~= 9 then
+					if i < craftingX.chest.size() then
 						if craftingX.chest.getItemDetail(i + 1).displayName == nil then
 							local PatternCount = craftingX.chest.getItemDetail(i).count
 							sendToStorage(false)
